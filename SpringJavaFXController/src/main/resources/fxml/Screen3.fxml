@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Group xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sunkur.springjavafxcontroller.screen3.Screen3Controller">
+   <children>
+      <StackPane prefHeight="150.0" prefWidth="200.0">
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #AAAABB;">
+               <children>
+                  <Button layoutX="121.0" layoutY="100.0" mnemonicParsing="false" onAction="#handleScreen2ButtonAction" text="Screen2" />
+                  <Button layoutX="21.0" layoutY="75.0" mnemonicParsing="false" onAction="#handleScreen1ButtonAction" text="Screen1" />
+                  <Label fx:id="screenName" layoutX="79.0" layoutY="27.0" text="SCREEN3" />
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </children>
+</Group>
