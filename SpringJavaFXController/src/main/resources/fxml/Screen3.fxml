@@ -13,8 +13,9 @@
             <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #AAAABB;">
                <children>
                   <Button layoutX="121.0" layoutY="100.0" mnemonicParsing="false" onAction="#handleScreen2ButtonAction" text="Screen2" />
-                  <Button layoutX="21.0" layoutY="75.0" mnemonicParsing="false" onAction="#handleScreen1ButtonAction" text="Screen1" />
+                  <Button layoutX="21.0" layoutY="88.0" mnemonicParsing="false" onAction="#handleScreen1ButtonAction" text="Screen1" />
                   <Label fx:id="screenName" layoutX="79.0" layoutY="27.0" text="SCREEN3" />
+                  <TextField fx:id="textField" layoutX="26.0" layoutY="50.0" />
                </children>
             </AnchorPane>
          </children>

@@ -12,6 +12,7 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextField;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,13 +21,17 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Screen1Controller extends BaseScreenController implements Initializable{
+    @FXML
+    private TextField textField;
     
     @FXML
     private void handleScreen2ButtonAction(ActionEvent event) {
+        //this.text = textField.getText();
         this.sc.loadScreen("/fxml/Screen2.fxml");
     }
        @FXML
     private void handleScreen3ButtonAction(ActionEvent event) {
+        //this.text = textField.getText();
         this.sc.loadScreen("/fxml/Screen3.fxml");
     }
 
@@ -34,6 +39,5 @@ public class Screen1Controller extends BaseScreenController implements Initializ
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.screenName.setText("Screen1");
-    }
-    
+    }   
 }

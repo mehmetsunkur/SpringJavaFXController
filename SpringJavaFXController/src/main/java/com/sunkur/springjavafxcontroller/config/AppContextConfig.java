@@ -19,5 +19,5 @@ import org.springframework.context.annotation.Import;
 @Import(ScreensContoller.class)
 @ComponentScan("com.sunkur.springjavafxcontroller")
 public class AppContextConfig {
-    
+
 }

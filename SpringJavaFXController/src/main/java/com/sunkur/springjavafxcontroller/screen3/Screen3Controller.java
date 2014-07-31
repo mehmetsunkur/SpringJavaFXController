@@ -6,12 +6,14 @@
 
 package com.sunkur.springjavafxcontroller.screen3;
 
+import com.sunkur.springjavafxcontroller.scope.ScreenScoped;
 import com.sunkur.springjavafxcontroller.screen.BaseScreenController;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextField;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,8 +21,10 @@ import org.springframework.stereotype.Component;
  * @author Mehmet Sunkur <mehmetsunkur@gmail.com>
  */
 @Component
+@ScreenScoped
 public class Screen3Controller extends BaseScreenController implements Initializable{
-
+    @FXML
+    private TextField textField;
     
     @FXML
     private void handleScreen1ButtonAction(ActionEvent event) {
@@ -33,7 +37,7 @@ public class Screen3Controller extends BaseScreenController implements Initializ
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-       this.screenName.setText("Screen3");
+       
     }
     
 }

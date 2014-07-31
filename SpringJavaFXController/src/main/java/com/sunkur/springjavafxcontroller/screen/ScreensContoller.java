@@ -5,10 +5,10 @@
  */
 package com.sunkur.springjavafxcontroller.screen;
 
+import com.sunkur.springjavafxcontroller.scope.ScreenScoped;
 import java.io.IOException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -22,17 +22,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -43,6 +36,8 @@ public class ScreensContoller implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
     private Stage stage;
+    private String currentScreenId;
+    private Map<String, BaseScreenController> screens = new HashMap<String, BaseScreenController>();
 
     public void init(Stage stage) {
         this.stage = stage;
@@ -52,20 +47,31 @@ public class ScreensContoller implements ApplicationContextAware {
     }
 
     public void loadScreen(String fxml) {
-
+        BaseScreenController oldScreenController = this.getCurrentController();
         try {
-            Class controllerClass = getControllerClass(fxml);
-            final Object springController = applicationContext.getBean(controllerClass);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-            loader.setControllerFactory(new Callback<Class<?>, Object>() {
-                @Override
-                public Object call(Class<?> aClass) {
-                    return springController;
+            Class controllerClass = FXMLUtils.getControllerClass(fxml);
+            final BaseScreenController fxmlController = (BaseScreenController) applicationContext.getBean(controllerClass);
+            if (this.screens.get(fxmlController.getScreenId()) == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+                loader.setControllerFactory(new Callback<Class<?>, Object>() {
+                    @Override
+                    public Object call(Class<?> aClass) {
+                        return fxmlController;
+                    }
+                });
+                Parent root = loader.load();
+                fxmlController.setRoot(root);
+                this.screens.put(fxmlController.getScreenId(), fxmlController);
+            }
+
+            this.currentScreenId = fxmlController.getScreenId();
+            swapScreen(getCurrentController().getRoot());
+            if (oldScreenController != null) {
+                if (oldScreenController.getClass().isAnnotationPresent(ScreenScoped.class)) {
+                    this.screens.remove(oldScreenController.getScreenId());
                 }
-            });
-            Parent root = loader.load();
-            swapScreen(root);
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -121,28 +127,16 @@ public class ScreensContoller implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    private Class getControllerClass(String fxmlPath) {
-
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder;
-            builder = factory.newDocumentBuilder();
-            URL location = getClass().getResource(fxmlPath);
-            
-            Document document = builder.parse(location.openStream());
-            NamedNodeMap attributes = document.getDocumentElement().getAttributes();
-            String fxControllerClassName=null;
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node item = attributes.item(i);
-                if(item.getNodeName().equals(FXMLLoader.FX_NAMESPACE_PREFIX+":"+FXMLLoader.CONTROLLER_KEYWORD)){
-                    fxControllerClassName = item.getNodeValue();
-                }
-            }
-            if(fxControllerClassName!=null)
-                return ClassLoader.getSystemClassLoader().loadClass(fxControllerClassName);
-        } catch (ParserConfigurationException | SAXException | IOException | ClassNotFoundException ex) {
-            Logger.getLogger(ScreensContoller.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+    public BaseScreenController getCurrentController() {
+        return screens.get(getCurrentScreenId());
     }
+
+    public String getCurrentScreenId() {
+        return currentScreenId;
+    }
+
+    public Map<String, BaseScreenController> getScreens() {
+        return screens;
+    }
+
 }
