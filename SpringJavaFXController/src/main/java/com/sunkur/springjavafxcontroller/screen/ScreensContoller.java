@@ -5,8 +5,10 @@
  */
 package com.sunkur.springjavafxcontroller.screen;
 
+import com.sunkur.springjavafxcontroller.scope.ScreenScope;
 import com.sunkur.springjavafxcontroller.scope.ScreenScoped;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.animation.KeyFrame;
@@ -23,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
@@ -32,13 +35,15 @@ import org.springframework.stereotype.Service;
  * @author Mehmet Sunkur <mehmetsunkur@gmail.com>
  */
 @Service
-public class ScreensContoller implements ApplicationContextAware {
+public class ScreensContoller implements ApplicationContextAware{
+    @Autowired
+    ScreenScope screenScope;
 
     private ApplicationContext applicationContext;
     private Stage stage;
     private String currentScreenId;
-    private Map<String, BaseScreenController> screens = new HashMap<String, BaseScreenController>();
-
+    private final Map<String, BaseScreenController> screens = Collections.synchronizedMap(new HashMap<String, BaseScreenController>());
+    
     public void init(Stage stage) {
         this.stage = stage;
         Group root = new Group();
@@ -52,6 +57,7 @@ public class ScreensContoller implements ApplicationContextAware {
 
             Class controllerClass = FXMLUtils.getControllerClass(fxml);
             final BaseScreenController fxmlController = (BaseScreenController) applicationContext.getBean(controllerClass);
+            
             if (this.screens.get(fxmlController.getScreenId()) == null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
                 loader.setControllerFactory(new Callback<Class<?>, Object>() {
@@ -70,6 +76,7 @@ public class ScreensContoller implements ApplicationContextAware {
             if (oldScreenController != null) {
                 if (oldScreenController.getClass().isAnnotationPresent(ScreenScoped.class)) {
                     this.screens.remove(oldScreenController.getScreenId());
+                    this.screenScope.remove(oldScreenController.getScreenId());
                 }
             }
 
@@ -122,11 +129,6 @@ public class ScreensContoller implements ApplicationContextAware {
         return getScreenRoot().getChildren().isEmpty();
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
-
     public BaseScreenController getCurrentController() {
         return screens.get(getCurrentScreenId());
     }
@@ -135,8 +137,8 @@ public class ScreensContoller implements ApplicationContextAware {
         return currentScreenId;
     }
 
-    public Map<String, BaseScreenController> getScreens() {
-        return screens;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
-
 }
